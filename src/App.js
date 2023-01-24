@@ -1,24 +1,86 @@
-import logo from './logo.svg';
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+// import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import './App.css';
+
+// Scene
+const scene = new THREE.Scene();
+
+// Create object
+const geometry = new THREE.SphereGeometry(3, 64, 64);
+const material = new THREE.MeshStandardMaterial({
+  color: "#00ff83",
+});
+const mesh = new THREE.Mesh(geometry, material);
+scene.add(mesh);
+
+// Create object gltf assets
+// const loader = new GLTFLoader();
+// loader.load("./assets/NSX.glb", function (gltf) {
+//   const model = gltf.scene;
+//   scene.add(model);
+// });
+
+// Sizes
+const sizes = {
+  width: window.innerWidth,
+  heigth: window.innerHeight,
+};
+
+// light
+const light = new THREE.PointLight(0xffffff, 1, 100);
+light.position.set(10, 10, 10);
+scene.add(light);
+
+// camera
+const camera = new THREE.PerspectiveCamera(
+  45,
+  sizes.width / sizes.heigth,
+  0.1,
+  50
+);
+camera.position.z = 20;
+scene.add(camera);
+
+// Render
+const canvas = document.querySelector(".webgl");
+const render = new THREE.WebGLRenderer({ canvas });
+
+render.setSize(sizes.width, sizes.heigth);
+render.render(scene, camera);
+
+// Controls
+const controls = new OrbitControls(camera, canvas);
+// controls.enableDamping = true;
+// controls.enableZoom = false;
+// controls.enablePan = false;
+
+// Resize
+window.addEventListener("resize", () => {
+  //   update size
+  sizes.width = window.width;
+  sizes.heigth = window.heigth;
+
+  // update camera
+  camera.aspect = sizes.width / sizes.heigth;
+  camera.updateProjectionMatrix();
+  render.setSize(sizes.width, sizes.heigth);
+});
+
+const loop = () => {
+  controls.update();
+  render.render(scene, camera);
+  window.requestAnimationFrame(loop);
+};
+
+loop();
+
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <canvas className="webgl">
+      
+    </canvas>
   );
 }
 
